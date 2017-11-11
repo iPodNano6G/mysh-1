@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
 
 #include "commands.h"
 #include "built_in.h"
@@ -34,7 +35,7 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
     struct single_command* com = (*commands);
 
     assert(com->argc != 0);
-
+    int ex;
     int built_in_pos = is_built_in_command(com->argv[0]);
     if (built_in_pos != -1) {
       if (built_in_commands[built_in_pos].command_validate(com->argc, com->argv)) {
@@ -50,7 +51,13 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
     } else if (strcmp(com->argv[0], "exit") == 0) {
       return 1;
     } else {
-      fprintf(stderr, "%s: command not found\n", com->argv[0]);
+        int i = fork();
+        if(i==0){
+          ex = execv(com->argv[0], com->argv);
+        }
+        if(ex == -1) {
+        fprintf(stderr, "%s: command not found\n", com->argv[0]);
+        }
       return -1;
     }
   }
