@@ -2,12 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "signal_handlers.h"
 #include "commands.h"
 #include "built_in.h"
 #include "utils.h"
 
-int main()
-{
+int main() {
+  catch_sigint(0);
+  catch_sigtstp(0);
+
   char buf[8096];
 
   while (1) {

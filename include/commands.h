@@ -8,7 +8,7 @@ struct single_command
 };
 
 int evaluate_command(int n_commands, struct single_command (*commands)[512]);
-
+int do_single_commands(struct single_command (*com)[512]);
 void free_commands(int n_commands, struct single_command (*commands)[512]);
 
 #endif // MYSH_COMMANDS_H_
