@@ -65,19 +65,33 @@ int do_single_commands(struct single_command (*commands)[512]) {
   } else if (strcmp(com->argv[0], "") == 0) {
     return 0;
   } else {
+      if(strcmp(com->argv[com->argc-1], "&") == 0) {
+        com->argv[com->argc-1] = '\0';
+        com->argc = com->argc - 1;
+        
+        setpgid(0, 0);
+        tcsetpgrp(0, getpid());
+        int pid = fork();
+        if(pid == 0) {
+          setpgid(0 , 0);
+          setpgid(0 , getppid());
+          execv(com->argv[0], com->argv);
+          exit(-1);
+        }
+        printf("%d\n", pid);
+      }
+      else {
+        int i = fork();
+        if(i==0){
+        ex = execv(com->argv[0], com->argv);
+        } 
+      }
       
-      int i = fork();
-      if(i==0){
-      ex = execv(com->argv[0], com->argv);
-    }
-    
-      
-    wait(&status);
-    signal(SIGTTOU, SIG_DFL);
 
-    if(ex == -1) {
+
+      if(ex == -1) {
       fprintf(stderr, "%s: command not found\n", com->argv[0]);
-    }
+      }
 
     return -1;
   }
